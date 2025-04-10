@@ -371,7 +371,7 @@ HardwareInterruptProtocolNotify (
   VOID        *Protocol;
   EFI_STATUS  Status;
 
-  Status = gBS->LocateProtocol (&gHardwareInterruptProtocolGuid, NULL, &Protocol);
+  Status = gBS->LocateProtocol (&gArmHardwareInterruptProtocolGuid, NULL, &Protocol);
   if (EFI_ERROR (Status)) {
     return;
   }
@@ -395,7 +395,7 @@ HardwareInterruptProtocolNotify (
 }
 
 EFI_STATUS
-CpuDxeInitialize (
+InitializeCpu (
   IN EFI_HANDLE        ImageHandle,
   IN EFI_SYSTEM_TABLE  *SystemTable
   )
@@ -463,10 +463,10 @@ CpuDxeInitialize (
   //
   // Interrupts should only be enabled on the CPU side after the GIC driver has
   // configured and deasserted all incoming interrupt lines. So keep interrupts
-  // masked until the gHardwareInterruptProtocolGuid protocol appears.
+  // masked until the gArmHardwareInterruptProtocolGuid protocol appears.
   //
   EfiCreateProtocolNotifyEvent (
-    &gHardwareInterruptProtocolGuid,
+    &gArmHardwareInterruptProtocolGuid,
     TPL_CALLBACK,
     HardwareInterruptProtocolNotify,
     NULL,
