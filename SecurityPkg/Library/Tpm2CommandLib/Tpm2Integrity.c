@@ -759,7 +759,6 @@ Tpm2PcrReadForActiveBank (
   UINT32              TcgRegistryHashAlg;
   UINTN               Index;
 
-
   PcrIndex = (UINT8)PcrHandle;
 
   if ((PcrIndex < 0) ||
@@ -773,8 +772,6 @@ Tpm2PcrReadForActiveBank (
   ZeroMem (&PcrSelectionOut, sizeof (PcrSelectionOut));
   ZeroMem (&PcrValues, sizeof (PcrValues));
   ZeroMem (&Pcrs, sizeof (TPML_PCR_SELECTION));
-
-  DEBUG ((DEBUG_INFO, "ReadPcr - %02d\n", PcrIndex));
 
   //
   // Read TPM capabilities
