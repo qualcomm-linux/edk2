@@ -331,7 +331,7 @@ Tpm2TisTpmCommand (
   }
 
   //
-  // Check the response data header (tag,parasize and returncode )
+  // Check the response data header (tag, parameter size and return code )
   //
   CopyMem (&Data16, BufferOut, sizeof (UINT16));
   // TPM2 should not use this RSP_COMMAND

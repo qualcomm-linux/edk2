@@ -8,6 +8,7 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #include <IndustryStandard/UefiTcgPlatform.h>
 #include <Library/Tpm2CommandLib.h>
+#include <Library/Tpm2DebugLib.h>
 #include <Library/Tpm2DeviceLib.h>
 #include <Library/BaseMemoryLib.h>
 #include <Library/BaseLib.h>
@@ -757,7 +758,7 @@ Tpm2PcrReadForActiveBank (
   UINT32              ActivePcrBanks;
   UINT32              TcgRegistryHashAlg;
   UINTN               Index;
-  UINTN               Index2;
+
 
   PcrIndex = (UINT8)PcrHandle;
 
@@ -868,20 +869,11 @@ Tpm2PcrReadForActiveBank (
     return EFI_DEVICE_ERROR;
   }
 
-  for (Index = 0; Index < PcrValues.count; Index++) {
-    DEBUG ((
-      DEBUG_INFO,
-      "ReadPcr - HashAlg = 0x%04x, Pcr[%02d], digest = ",
-      PcrSelectionOut.pcrSelections[Index].hash,
-      PcrIndex
-      ));
-
-    for (Index2 = 0; Index2 < PcrValues.digests[Index].size; Index2++) {
-      DEBUG ((DEBUG_INFO, "%02x ", PcrValues.digests[Index].buffer[Index2]));
-    }
-
-    DEBUG ((DEBUG_INFO, "\n"));
-  }
+  DumpPcrDigest (
+    PcrIndex,
+    PcrSelectionOut.pcrSelections[Index].hash,
+    &PcrValues
+    );
 
   if (HashList != NULL) {
     CopyMem (
