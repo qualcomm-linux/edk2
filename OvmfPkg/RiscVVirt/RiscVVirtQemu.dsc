@@ -25,6 +25,11 @@
   FLASH_DEFINITION               = OvmfPkg/RiscVVirt/RiscVVirtQemu.fdf
 
   #
+  # Option to enable PEI booting.
+  #
+  DEFINE RISCVVIRT_PEI_BOOTING   = FALSE
+
+  #
   # Enable below options may cause build error or may not work on
   # the initial version of RISC-V package
   # Defines for default states.  These can be changed on the command line.
@@ -61,6 +66,9 @@
 !include NetworkPkg/Network.dsc.inc
 
 [BuildOptions]
+!if $(RISCVVIRT_PEI_BOOTING) == TRUE
+  GCC:*_*_*_CC_FLAGS             = -DRISCVVIRT_PEI_BOOTING
+!endif
   GCC:RELEASE_*_*_CC_FLAGS       = -DMDEPKG_NDEBUG
 !ifdef $(SOURCE_DEBUG_ENABLE)
   GCC:*_*_RISCV64_GENFW_FLAGS    = --keepexceptiontable
@@ -257,16 +265,36 @@
   #
   # SEC Phase modules
   #
-  UefiCpuPkg/PeilessSecCore/PeilessSecCore.inf {
+!if $(RISCVVIRT_PEI_BOOTING) == TRUE
+  UefiCpuPkg/SecCore/SecCoreNative.inf {
     <LibraryClasses>
+      PlatformSecLib|OvmfPkg/RiscVVirt/Library/PlatformSecLib/PlatformSecLib.inf
+  }
+  OvmfPkg/RiscVVirt/PlatformPei/PlatformPeim.inf {
+    <LibraryClasses>
+      PlatformSecLib|OvmfPkg/RiscVVirt/Library/PlatformSecLib/PlatformSecLib.inf
+  }
+  MdeModulePkg/Core/Pei/PeiMain.inf
+  MdeModulePkg/Universal/PCD/Pei/Pcd.inf  {
+    <LibraryClasses>
+      PcdLib|MdePkg/Library/BasePcdLibNull/BasePcdLibNull.inf
+  }
+  MdeModulePkg/Universal/Variable/Pei/VariablePei.inf
+  MdeModulePkg/Core/DxeIplPeim/DxeIpl.inf {
+    <LibraryClasses>
+      NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
+  }
+!else
+  UefiCpuPkg/SecCore/SecCoreNative.inf {
+    <LibraryClasses>
+      PlatformSecLib|OvmfPkg/RiscVVirt/Library/PlatformSecLib/PlatformSecLib.inf
       ExtractGuidedSectionLib|EmbeddedPkg/Library/PrePiExtractGuidedSectionLib/PrePiExtractGuidedSectionLib.inf
       NULL|MdeModulePkg/Library/LzmaCustomDecompressLib/LzmaCustomDecompressLib.inf
-      PrePiLib|EmbeddedPkg/Library/PrePiLib/PrePiLib.inf
       HobLib|EmbeddedPkg/Library/PrePiHobLib/PrePiHobLib.inf
       PrePiHobListPointerLib|OvmfPkg/RiscVVirt/Library/PrePiHobListPointerLib/PrePiHobListPointerLib.inf
       MemoryAllocationLib|EmbeddedPkg/Library/PrePiMemoryAllocationLib/PrePiMemoryAllocationLib.inf
-      PlatformSecLib|OvmfPkg/RiscVVirt/Library/PlatformSecLib/PlatformSecLib.inf
   }
+!endif
 
   #
   # DXE
