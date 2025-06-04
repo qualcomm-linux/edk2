@@ -305,6 +305,10 @@ HttpBootIp4DxeDriverBindingSupported (
 {
   EFI_STATUS  Status;
 
+  if (PcdGet8 (PcdIPv4HttpSupport) == HTTP_DISABLED) {
+    return EFI_UNSUPPORTED;
+  }
+
   //
   // Try to open the DHCP4, HTTP4 and Device Path protocol.
   //
@@ -794,6 +798,10 @@ HttpBootIp6DxeDriverBindingSupported (
   )
 {
   EFI_STATUS  Status;
+
+  if (PcdGet8 (PcdIPv6HttpSupport) == HTTP_DISABLED) {
+    return EFI_UNSUPPORTED;
+  }
 
   //
   // Try to open the DHCP6, HTTP and Device Path protocol.
@@ -1295,6 +1303,10 @@ HttpBootDxeDriverEntryPoint (
   )
 {
   EFI_STATUS  Status;
+
+  if ((PcdGet8 (PcdIPv4HttpSupport) == HTTP_DISABLED) && (PcdGet8 (PcdIPv6HttpSupport) == HTTP_DISABLED)) {
+    return EFI_UNSUPPORTED;
+  }
 
   //
   // Install UEFI Driver Model protocol(s).
