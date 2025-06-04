@@ -6,7 +6,7 @@
 #ifndef _EFI_CXLDXE_UTILS_H_
 #define _EFI_CXLDXE_UTILS_H_
 
-#include <string.h>
+#include <stddef.h>
 
 /**
   Returns minimum among the input values

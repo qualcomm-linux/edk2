@@ -82,8 +82,8 @@ CxlSendCmd (
     return Status;
   }
 
-  OutputSize    = Private->MailboxCmd.OutputSize;
-  MinimumOutput = Private->MailboxCmd.MinimumOutput;
+  OutputSize    = (size_t)Private->MailboxCmd.OutputSize;
+  MinimumOutput = (size_t)Private->MailboxCmd.MinimumOutput;
   Status        = CxlPciMboxSend (Private);
   if (Status != EFI_SUCCESS) {
     DEBUG ((EFI_D_ERROR, "[%a]: Error returned in func CxlPciMboxSend()\n", __func__));
@@ -349,7 +349,7 @@ CxlMemActivateFw (
 EFI_STATUS
 CxlMemTransferFw (
   CXL_CONTROLLER_PRIVATE_DATA  *Private,
-  UINT32                       NextSlot,
+  UINT8                        NextSlot,
   const UINT8                  *Data,
   UINT32                       Offset,
   UINT32                       Size,
@@ -429,7 +429,7 @@ CxlMemTransferFw (
     }
   } else {
     GetChunkCount (Size, CurrentSize, &ChunkCount, &ChunkSize);
-    for (int Index = 0; Index < ChunkCount; Index++) {
+    for (UINT32 Index = 0; Index < ChunkCount; Index++) {
       if (Offset == 0) {
         TransferFw->Action = CXL_FW_TRANSFER_ACTION_INITIATE;
       } else if (Remaining < ChunkSize) {
@@ -976,7 +976,7 @@ CxlPciMboxSend (
   UINT64      StatusRegister;
   size_t      OutputLength;
   UINT32      Value;
-  int         Index;
+  UINT32      Index;
   size_t      MinimumNumber;
   UINT64      BackgroundStatusRegister;
 
@@ -1077,11 +1077,11 @@ CxlPciMboxSend (
   }
 
   // Payload Length: (36:16)
-  OutputLength = GetFieldValues (CommandRegister, 36, 16);
+  OutputLength = (size_t)GetFieldValues (CommandRegister, 36, 16);
 
   /* #8 */
   if (OutputLength && Private->MailboxCmd.OutputPayload) {
-    MinimumNumber = MinimumOfThreeValues (Private->MailboxCmd.OutputSize, Private->MemdevState.PayloadSize, OutputLength);
+    MinimumNumber = (size_t)MinimumOfThreeValues (Private->MailboxCmd.OutputSize, Private->MemdevState.PayloadSize, OutputLength);
 
     /*Read Payload buffer in n Bytes*/
     char  Buffer[256];
@@ -1092,7 +1092,7 @@ CxlPciMboxSend (
     }
 
     Private->MailboxCmd.OutputSize = MinimumNumber;
-    MinimumNumber                  = MinimumOfThreeValues (Private->MailboxCmd.OutputSize, Private->MemdevState.PayloadSize, OutputLength);
+    MinimumNumber                  = (size_t)MinimumOfThreeValues (Private->MailboxCmd.OutputSize, Private->MemdevState.PayloadSize, OutputLength);
     CopyMem (Private->MailboxCmd.OutputPayload, Buffer, MinimumNumber);
   } else {
     Private->MailboxCmd.OutputSize = 0;

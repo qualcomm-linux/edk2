@@ -424,7 +424,7 @@ CxlMemGetFwInfo (
 EFI_STATUS
 CxlMemTransferFw (
   CXL_CONTROLLER_PRIVATE_DATA  *Private,
-  UINT32                       NextSlot,
+  UINT8                        NextSlot,
   const UINT8                  *Data,
   UINT32                       Offset,
   UINT32                       Size,
