@@ -16,7 +16,6 @@
   @retval Minimum                     Returns minimum value among the given input values
 
   **/
-inline
 UINT64
 MinimumOfThreeValues (
   UINT64  ValOne,
