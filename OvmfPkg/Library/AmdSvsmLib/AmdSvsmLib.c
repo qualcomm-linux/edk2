@@ -593,3 +593,86 @@ AmdSvsmVtpmCmd (
 
   return (Ret == 0) ? TRUE : FALSE;
 }
+
+BOOLEAN
+EFIAPI
+AmdSvsmQueryProtocol (
+  IN  UINT32  ProtocolId,
+  IN  UINT32  ProtocolVersion,
+  OUT UINT32  *ProtocolMin,
+  OUT UINT32  *ProtocolMax
+  )
+{
+  SVSM_CALL_DATA  SvsmCallData;
+  SVSM_FUNCTION   Function;
+  UINT64          Rcx;
+  UINTN           Ret;
+
+  Function.Id.Protocol = SVSM_PROTOCOL_CORE;
+  Function.Id.CallId   = SVSM_CORE_QUERY_PROTOCOL;
+
+  Rcx = ((UINT64)ProtocolId << 32) | ProtocolVersion;
+
+  SvsmCallData.Caa   = (SVSM_CAA *)AmdSvsmSnpGetCaa ();
+  SvsmCallData.RaxIn = Function.Uint64;
+  SvsmCallData.RcxIn = Rcx;
+
+  Ret = SvsmMsrProtocol (&SvsmCallData);
+  if (Ret != 0) {
+    return FALSE;
+  }
+
+  if (SvsmCallData.RcxOut == 0) {
+    return FALSE;
+  }
+
+  if (ProtocolMin) {
+    *ProtocolMin = (UINT32)(SvsmCallData.RcxOut & 0xffffffff);
+  }
+
+  if (ProtocolMax) {
+    *ProtocolMax = (UINT32)(SvsmCallData.RcxOut >> 32);
+  }
+
+  return TRUE;
+}
+
+BOOLEAN
+EFIAPI
+AmdSvsmUefiMmCall (
+  IN  UINT32   CallId,
+  IN  UINT64   Rcx,
+  IN  UINT64   Rdx,
+  IN  BOOLEAN  Runtime
+  )
+{
+  SVSM_CALL_DATA  SvsmCallData;
+  SVSM_FUNCTION   Function;
+  UINT64          Caa;
+  UINTN           Ret;
+
+  Function.Id.Protocol = SVSM_UEFI_MM_PROTOCOL;
+  Function.Id.CallId   = CallId;
+
+  if (Runtime) {
+    Caa = AsmReadMsr64 (0xC001F000 /* FIXME: add #define */);
+  } else {
+    Caa = AmdSvsmSnpGetCaa ();
+  }
+
+  DEBUG ((
+    DEBUG_INFO,
+    "%a: runtime %a, caa %lx\n",
+    __func__,
+    Runtime ? "yes" : "no",
+    Caa
+    ));
+
+  SvsmCallData.Caa   = (SVSM_CAA *)Caa;
+  SvsmCallData.RaxIn = Function.Uint64;
+  SvsmCallData.RcxIn = Rcx;
+  SvsmCallData.RdxIn = Rdx;
+
+  Ret = SvsmMsrProtocol (&SvsmCallData);
+  return (Ret == 0) ? TRUE : FALSE;
+}
