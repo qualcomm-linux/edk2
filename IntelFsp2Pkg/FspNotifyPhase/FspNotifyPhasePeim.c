@@ -84,19 +84,23 @@ WaitForNotify (
   FspSiliconInitDone2 (EFI_SUCCESS);
 
   //
+  // Fsp notify phase check
+  //
+  DEBUG ((DEBUG_INFO, "FspWaitForNotify () called ...\n"));
+  ASSERT (GetFspApiCallingIndex () == NotifyPhaseApiIndex);
+
+  //
   // BootLoader called FSP again through NotifyPhase
   //
   FspWaitForNotify ();
 
-  if (GetFspGlobalDataPointer ()->FspMode == FSP_IN_API_MODE) {
-    //
-    // Should not come here
-    //
-    while (TRUE) {
-      DEBUG ((DEBUG_ERROR, "No FSP API should be called after FSP is DONE!\n"));
-      SetFspApiReturnStatus (EFI_UNSUPPORTED);
-      Pei2LoaderSwitchStack ();
-    }
+  //
+  // Should not come here
+  //
+  while (TRUE) {
+    DEBUG ((DEBUG_ERROR, "No FSP API should be called after FSP is DONE!\n"));
+    SetFspApiReturnStatus (EFI_UNSUPPORTED);
+    Pei2LoaderSwitchStack ();
   }
 
   return EFI_SUCCESS;
