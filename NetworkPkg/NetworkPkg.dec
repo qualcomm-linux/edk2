@@ -187,6 +187,16 @@
   # @Prompt The value of Retry Count,  Default value is 0.
   gEfiNetworkPkgTokenSpaceGuid.PcdHttpDnsRetryCount|0|UINT32|0x00000011
 
+  ## IPv4 HTTP support
+  # 0x01 = HTTP Enabled
+  # 0x00 = HTTP Disabled
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv4HttpSupport|0x01|UINT8|0x10000012
+
+  ## IPv6 HTTP support
+  # 0x01 = HTTP Enabled
+  # 0x00 = HTTP Disabled
+  gEfiNetworkPkgTokenSpaceGuid.PcdIPv6HttpSupport|0x01|UINT8|0x10000013
+
   ## The default size of the HTTP transfer data buffer in bytes.
   # This size is used for HTTP transfers, with a default value of 2MB.
   # Increasing the buffer size can enhance performance for high-bandwidth connections.

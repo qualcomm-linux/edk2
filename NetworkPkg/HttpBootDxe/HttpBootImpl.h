@@ -11,6 +11,9 @@ SPDX-License-Identifier: BSD-2-Clause-Patent
 
 #define HTTP_BOOT_CHECK_MEDIA_WAITING_TIME  EFI_TIMER_PERIOD_SECONDS(20)
 
+#define HTTP_ENABLED   0x01
+#define HTTP_DISABLED  0x00
+
 typedef enum {
   GetBootFileHead,
   GetBootFileGet,
